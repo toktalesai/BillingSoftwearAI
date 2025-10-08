@@ -10,7 +10,7 @@ namespace TVTRON_Bills
         public MainForm()
         {
             InitializeComponents();
-            this.Text = "TVTron Bills";
+            this.Text = "TVTron Bills organization faced";
             this.WindowState = FormWindowState.Maximized;
             this.Load += MainForm_Load;
             this.Load += MainForm_Load;
@@ -22,7 +22,7 @@ namespace TVTRON_Bills
 
             // Option A: Load local file (index.html) from app folder
             string appPath = AppDomain.CurrentDomain.BaseDirectory;
-            string indexPath = Path.Combine(appPath, "wwwroot", "Bills.html");
+            string indexPath = Path.Combine(appPath, "wwwroot", "Bills_New.html");
             if (File.Exists(indexPath))
             {
                 webView.Source = new Uri(indexPath);
@@ -38,10 +38,11 @@ namespace TVTRON_Bills
         {
             webView = new WebView2
             {
-                Dock = DockStyle.Fill
+                Dock = DockStyle.Dock
             };
             this.Controls.Add(webView);
         }
     }
 }
+
 
