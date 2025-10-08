@@ -29,7 +29,8 @@ namespace TVTRON_Bills
                 webView.Source = new Uri(indexPath);
                 return;
             }
-
+             //Add the below code for the opposite site developement
+              webView.CoreWebView2.Navigate("https://google.com");
             // Option B: fallback to a remote URL if provided
             webView.CoreWebView2.Navigate("https://example.com");
         }
