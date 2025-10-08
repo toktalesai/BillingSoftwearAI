@@ -3,7 +3,7 @@ using Microsoft.Web.WebView2.WinForms;
 
 namespace TVTRON_Bills
 {
-    public partial class MainForm : Form
+    public partial class MainForm : BaseForm
     {
         private WebView2 webView;
 
