@@ -1,0 +1,45 @@
+using Microsoft.Web.WebView2.Core;
+using Microsoft.Web.WebView2.WinForms;
+
+namespace TVTRON_Bills
+{
+    public partial class MainForm : Form
+    {
+        private WebView2 webView;
+
+        public MainForm()
+        {
+            this.Text = "TVTron Bills";
+            this.WindowState = FormWindowState.Maximized;
+            this.Load += MainForm_Load;
+            InitializeComponents();
+        }
+
+        private async void MainForm_Load(object sender, EventArgs e)
+        {
+            var env = await CoreWebView2Environment.CreateAsync();
+            await webView.EnsureCoreWebView2Async(env);
+
+            // Option A: Load local file (index.html) from app folder
+            string appPath = AppDomain.CurrentDomain.BaseDirectory;
+            string indexPath = Path.Combine(appPath, "wwwroot", "Bills.html");
+            if (File.Exists(indexPath))
+            {
+                webView.Source = new Uri(indexPath);
+                return;
+            }
+
+            // Option B: fallback to a remote URL if provided
+            webView.CoreWebView2.Navigate("https://example.com");
+        }
+
+        private void InitializeComponents()
+        {
+            webView = new WebView2
+            {
+                Dock = DockStyle.Fill
+            };
+            this.Controls.Add(webView);
+        }
+    }
+}

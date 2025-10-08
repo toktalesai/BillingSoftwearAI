@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TVTron Enterprise - Professional Invoice Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 15px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: white;
+            border-radius: 15px;
+            padding: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 15px 20px;
+            border: none;
+            background: transparent;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            color: #666;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .tab-content {
+            display: none;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .form-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+
+        .form-section h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .products-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border-left: 4px solid #667eea;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        .products-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 900px;
+        }
+
+        .products-table th {
+            background: #667eea;
+            color: white;
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            border-bottom: 2px solid #5a67d8;
+        }
+
+        .products-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e1e5e9;
+            vertical-align: middle;
+        }
+
+        .products-table tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .products-table input {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .products-table input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+        }
+
+        .products-table input[readonly] {
+            background-color: #f8f9fa;
+            color: #666;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #56ab2f, #a8e6cf);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #ff416c, #ff4b2b);
+            color: white;
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            text-align: center;
+            border-top: 4px solid #667eea;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .invoice-preview {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin: 30px 0;
+            position: relative;
+        }
+
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 120px;
+            color: rgba(102, 126, 234, 0.1);
+            font-weight: bold;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .invoice-header {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .invoice-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            position: relative;
+            z-index: 2;
+        }
+
+        .invoice-table th, .invoice-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .invoice-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+
+        .total-section {
+            text-align: right;
+            margin-top: 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .action-buttons {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .nav-tabs {
+                flex-direction: column;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .products-table {
+                min-width: 700px;
+            }
+
+            .invoice-header {
+                grid-template-columns: 1fr;
+            }
+
+            .table-container {
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="LOGO.jpg" alt="Your Logo" style="width: 100px; height: 100px; border-radius: 50%;">
+            <h1>TVTron Enterprise</h1>
+            <p class="subtitle">TVTron Enterprise Invoice Generator</p>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="tab-btn active" onclick="showTab('dashboard')">📊 Dashboard</button>
+            <button class="tab-btn" onclick="showTab('create-bill')">📄 Create Bill</button>
+            <button class="tab-btn" onclick="showTab('settings')">⚙️ Settings</button>
+        </div>
+
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content active">
+            <h2 style="margin-bottom: 30px; color: #333;">Dashboard Overview</h2>
+            <div class="dashboard-stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalBills">0</div>
+                    <div class="stat-label">Total Bills Generated</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalAmount">₹0</div>
+                    <div class="stat-label">Total Amount</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="thisMonth">0</div>
+                    <div class="stat-label">This Month</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="lastInvoice">-</div>
+                    <div class="stat-label">Last Invoice No.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Create Bill Tab -->
+        <div id="create-bill" class="tab-content">
+            <h2 style="margin-bottom: 30px; color: #333;">Create New Invoice</h2>
+            
+            <div class="form-grid">
+                <div class="form-section">
+                    <h3>📋 Invoice Details</h3>
+                    <div class="form-group">
+                        <label>Invoice Number</label>
+                        <input type="text" id="invoiceNo">
+                    </div>
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" id="invoiceDate">
+                    </div>
+                    <div class="form-group">
+                        <label>Buyer Order Number</label>
+                        <input type="text" id="buyerOrderNo" placeholder="Enter buyer order number">
+                    </div>
+                    <div class="form-group">
+                        <label>Delivery Date</label>
+                        <input type="date" id="deliveryDate">
+                    </div>
+                    <div class="form-group">
+                        <label>Dispatch Document Number</label>
+                        <input type="text" id="dispatchDocNo" placeholder="Enter dispatch document number">
+                    </div>
+                    <div class="form-group">
+                        <label>Mode OF Transport</label>
+                        <input type="text" id="ModeOfTransport" placeholder="Enter mode of transport">
+                    </div>
+                    <div class="form-group">
+                        <label>Number of Parcel</label>
+                        <input type="text" id="NumberOfParcel" placeholder="Enter number of Parcel">
+                    </div>					
+                    <div class="form-group">
+                        <label>Terms of Delivery</label>
+                        <input type="text" id="termsOfDelivery" placeholder="Enter terms of delivery">
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>🏢 Buyer Details</h3>
+                    <div class="form-group">
+                        <label>Buyer Name</label>
+                        <input type="text" id="buyerName" placeholder="Enter buyer name">
+                    </div>
+                    <div class="form-group">
+                        <label>Buyer Address</label>
+                        <textarea id="buyerAddress" rows="3" placeholder="Enter buyer address"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Buyer Phone</label>
+                        <input type="tel" id="buyerPhone" placeholder="Enter buyer phone number">
+                    </div>
+                    <div class="form-group">
+                        <label>Buyer Pincode</label>
+                        <input type="text" id="buyerPincode" placeholder="Enter buyer pincode">
+                    </div>
+					<div class="form-group">
+                        <label>Buyer GSTIN</label>
+                        <input type="text" id="buyerGSTIN" placeholder="Enter buyer GSTIN">
+                    </div>
+                </div>
+            </div>
+
+            <div class="products-section">
+                <h3 style="margin-bottom: 20px; color: #333;">🛍️ Product Details</h3>
+                <div class="table-container">
+                    <table class="products-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px;">No.</th>
+                                <th style="min-width: 200px;">Product Name</th>
+                                <th style="width: 120px;">HSN/SAC</th>
+                                <th style="width: 100px;">GST Rate (%)</th>
+                                <th style="width: 100px;">Quantity</th>
+                                <th style="width: 120px;">Rate (₹)</th>
+                                <th style="width: 100px;">Discount (%)</th>
+                                <th style="width: 120px;">Total (₹)</th>
+                                <th style="width: 80px;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productsTableBody">
+                        </tbody>
+                    </table>
+                </div>
+                <button type="button" class="btn btn-secondary" onclick="addProduct()">+ Add Product</button>
+            </div>
+
+            <div class="action-buttons">
+                <button type="button" class="btn btn-success" onclick="downloadPDF()" style="font-size: 16px; padding: 15px 30px;">📄 Download PDF Invoice</button>
+            </div>
+
+            <div id="invoicePreview" class="invoice-preview hidden">
+                <div class="watermark">TVTron Enterprise</div>
+                <!-- Invoice content will be generated here -->
+            </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div id="settings" class="tab-content">
+            <h2 style="margin-bottom: 30px; color: #333;">Settings</h2>
+            
+            <div class="form-grid">
+                <div class="form-section">
+                    <h3>🏢 Company Details</h3>
+                    <div class="form-group">
+                        <label>Company Name</label>
+                        <input type="text" id="companyName" placeholder="Enter company name">
+                    </div>
+                    <div class="form-group">
+                        <label>Company Address</label>
+                        <textarea id="companyAddress" rows="3" placeholder="Enter company address"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Company Phone</label>
+                        <input type="tel" id="companyPhone" placeholder="Enter company phone">
+                    </div>
+                    <div class="form-group">
+                        <label>Company Code/GSTIN</label>
+                        <input type="text" id="companyCode" placeholder="Enter GSTIN number">
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>🏦 Bank Details</h3>
+                    <div class="form-group">
+                        <label>Bank Name</label>
+                        <input type="text" id="bankName" placeholder="Enter bank name">
+                    </div>
+                    <div class="form-group">
+                        <label>Account Number</label>
+                        <input type="text" id="accountNumber" placeholder="Enter account number">
+                    </div>
+                    <div class="form-group">
+                        <label>IFSC Code</label>
+                        <input type="text" id="ifscCode" placeholder="Enter IFSC code">
+                    </div>
+                    <div class="form-group">
+                        <label>Branch Name</label>
+                        <input type="text" id="branchName" placeholder="Enter branch name">
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 30px;">
+                <button type="button" class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let invoiceCounter = 1;
+        let products = [];
+        let totalBills = 0;
+        let totalAmount = 0;
+
+        // Initialize the application
+        function init() {
+            loadSettings();
+            loadDashboardData();
+            generateInvoiceNumber();
+            setCurrentDate();
+            addProduct();
+        }
+
+        // Tab functionality
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Generate unique invoice number
+        function generateInvoiceNumber() {
+            const savedCounter = localStorage.getItem('invoiceCounter');
+            if (savedCounter) {
+                invoiceCounter = parseInt(savedCounter) + 1;
+            }
+            
+            const invoiceNo = `TVB${String(invoiceCounter).padStart(4, '0')}`;
+            document.getElementById('invoiceNo').value = invoiceNo;
+        }
+
+        // Set current date
+        function setCurrentDate() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('invoiceDate').value = today;
+        }
+
+        // Add product row
+        function addProduct() {
+            const productIndex = products.length;
+            const row = document.createElement('tr');
+            row.setAttribute('data-index', productIndex);
+            
+            row.innerHTML = `
+                <td>${productIndex + 1}</td>
+                <td><input type="text" placeholder="Enter product name" onchange="updateProduct(${productIndex}, 'name', this.value)"></td>
+                <td><input type="text" placeholder="HSN/SAC" onchange="updateProduct(${productIndex}, 'hsn', this.value)"></td>
+                <td><input type="number" placeholder="18" onchange="updateProduct(${productIndex}, 'gst', this.value); calculateProductTotal(${productIndex})"></td>
+                <td><input type="number" placeholder="1" onchange="updateProduct(${productIndex}, 'quantity', this.value); calculateProductTotal(${productIndex})"></td>
+                <td><input type="number" placeholder="100.00" onchange="updateProduct(${productIndex}, 'rate', this.value); calculateProductTotal(${productIndex})"></td>
+                <td><input type="number" placeholder="0" onchange="updateProduct(${productIndex}, 'discount', this.value); calculateProductTotal(${productIndex})"></td>
+                <td><input type="number" readonly class="total-field" placeholder="0.00"></td>
+                <td><button type="button" class="btn btn-danger" onclick="removeProduct(${productIndex})">×</button></td>
+            `;
+            
+            document.getElementById('productsTableBody').appendChild(row);
+            
+            products.push({
+                name: '',
+                hsn: '',
+                gst: 0,
+                quantity: 0,
+                rate: 0,
+                discount: 0,
+                total: 0
+            });
+        }
+
+        // Update product data
+        function updateProduct(index, field, value) {
+            if (products[index]) {
+                products[index][field] = value;
+            }
+        }
+
+        // Calculate product total
+        function calculateProductTotal(index) {
+            const product = products[index];
+            if (product) {
+                const subtotal = (parseFloat(product.quantity) || 0) * (parseFloat(product.rate) || 0);
+                const discountAmount = subtotal * ((parseFloat(product.discount) || 0) / 100);
+                const afterDiscount = subtotal - discountAmount;
+                const gstAmount = afterDiscount * ((parseFloat(product.gst) || 0) / 100);
+                product.total = afterDiscount + gstAmount;
+                
+                const totalField = document.querySelector(`tr[data-index="${index}"] .total-field`);
+                if (totalField) {
+                    totalField.value = product.total.toFixed(2);
+                }
+            }
+        }
+
+        // Remove product
+        function removeProduct(index) {
+            const productRow = document.querySelector(`tr[data-index="${index}"]`);
+            if (productRow) {
+                productRow.remove();
+                products.splice(index, 1);
+                updateProductNumbers();
+            }
+        }
+
+        // Update product numbers after removal
+        function updateProductNumbers() {
+            const productRows = document.querySelectorAll('#productsTableBody tr[data-index]');
+            productRows.forEach((row, index) => {
+                row.setAttribute('data-index', index);
+                row.querySelector('td:first-child').textContent = index + 1;
+                
+                // Update all onchange handlers
+                const inputs = row.querySelectorAll('input[onchange]');
+                inputs.forEach(input => {
+                    const onchangeAttr = input.getAttribute('onchange');
+                    const newOnchange = onchangeAttr.replace(/\d+/g, index);
+                    input.setAttribute('onchange', newOnchange);
+                });
+                
+                const button = row.querySelector('button[onclick]');
+                if (button) {
+                    button.setAttribute('onclick', `removeProduct(${index})`);
+                }
+            });
+        }
+
+        // Convert number to words
+        function numberToWords(num) {
+            const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
+            const teens = ['Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+            const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+            const thousands = ['', 'Thousand', 'Lakh', 'Crore'];
+
+            if (num === 0) return 'Zero';
+
+            function convertHundreds(n) {
+                let result = '';
+                if (n >= 100) {
+                    result += ones[Math.floor(n / 100)] + ' Hundred ';
+                    n %= 100;
+                }
+                if (n >= 20) {
+                    result += tens[Math.floor(n / 10)] + ' ';
+                    n %= 10;
+                }
+                if (n >= 10) {
+                    result += teens[n - 10] + ' ';
+                } else if (n > 0) {
+                    result += ones[n] + ' ';
+                }
+                return result;
+            }
+
+            let result = '';
+            let thousandIndex = 0;
+            
+            while (num > 0) {
+                if (num % 1000 !== 0) {
+                    result = convertHundreds(num % 1000) + thousands[thousandIndex] + ' ' + result;
+                }
+                num = Math.floor(num / 1000);
+                thousandIndex++;
+            }
+
+            return result.trim();
+        }
+
+        // Generate invoice preview
+        function generatePreview() {
+            const companyName = document.getElementById('companyName').value || 'TVTron Enterprise';
+            const companyAddress = document.getElementById('companyAddress').value || 'Company Address';
+            const companyPhone = document.getElementById('companyPhone').value || 'Phone Number';
+            const companyCode = document.getElementById('companyCode').value || 'GSTIN';
+            
+            const buyerName = document.getElementById('buyerName').value;
+            const buyerAddress = document.getElementById('buyerAddress').value;
+            const buyerPhone = document.getElementById('buyerPhone').value;
+            const buyerPincode = document.getElementById('buyerPincode').value;
+            const buyerGSTIN = document.getElementById('buyerGSTIN').value;
+            const invoiceNo = document.getElementById('invoiceNo').value;
+            const invoiceDate = document.getElementById('invoiceDate').value;
+            const buyerOrderNo = document.getElementById('buyerOrderNo').value;
+            const deliveryDate = document.getElementById('deliveryDate').value;
+            const dispatchDocNo = document.getElementById('dispatchDocNo').value;
+            const ModeOfTransport = document.getElementById('ModeOfTransport').value;
+            const NumberOfParcel = document.getElementById('NumberOfParcel').value;
+            const termsOfDelivery = document.getElementById('termsOfDelivery').value;
+
+            const bankName = document.getElementById('bankName').value || 'Bank Name';
+            const accountNumber = document.getElementById('accountNumber').value || 'Account Number';
+            const ifscCode = document.getElementById('ifscCode').value || 'IFSC Code';
+            const branchName = document.getElementById('branchName').value || 'Branch Name';
+
+            let subtotal = 0;
+            let totalGST = 0;
+            let grandTotal = 0;
+
+            products.forEach(product => {
+                const productSubtotal = (parseFloat(product.quantity) || 0) * (parseFloat(product.rate) || 0);
+                const discountAmount = productSubtotal * ((parseFloat(product.discount) || 0) / 100);
+                const afterDiscount = productSubtotal - discountAmount;
+                const gstAmount = afterDiscount * ((parseFloat(product.gst) || 0) / 100);
+                
+                subtotal += afterDiscount;
+                totalGST += gstAmount;
+                grandTotal += afterDiscount + gstAmount;
+            });
+
+            const amountInWords = numberToWords(Math.floor(grandTotal));
+
+            let productsHTML = '';
+            products.forEach((product, index) => {
+                if (product.name || product.quantity || product.rate) {
+                    const productSubtotal = (parseFloat(product.quantity) || 0) * (parseFloat(product.rate) || 0);
+                    const discountAmount = productSubtotal * ((parseFloat(product.discount) || 0) / 100);
+                    const afterDiscount = productSubtotal - discountAmount;
+                    const gstAmount = afterDiscount * ((parseFloat(product.gst) || 0) / 100);
+                    const total = afterDiscount + gstAmount;
+
+                    productsHTML += `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${product.name || ''}</td>
+                            <td>${product.hsn || ''}</td>
+                            <td>${product.gst || 0}%</td>
+                            <td>${product.quantity || 0}</td>
+                            <td>₹${(parseFloat(product.rate) || 0).toFixed(2)}</td>
+                            <td>${product.discount || 0}%</td>
+                            <td>₹${total.toFixed(2)}</td>
+                        </tr>
+                    `;
+                }
+            });
+
+            const previewHTML = `
+                <div class="watermark">TVTron Enterprise</div>
+                <div style="position: relative; z-index: 2;">
+                    <div class="invoice-header">
+                        <div>
+                            <h2 style="color: #667eea; margin-bottom: 15px;">${companyName}</h2>
+                            <p><strong>Address:</strong> ${companyAddress}</p>
+                            <p><strong>Phone:</strong> ${companyPhone}</p>
+                            <p><strong>GSTIN:</strong> ${companyCode}</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <h1 style="color: #333; margin-bottom: 20px;">TAX INVOICE</h1>
+                            <p><strong>Invoice No:</strong> ${invoiceNo}</p>
+                            <p><strong>Date:</strong> ${invoiceDate}</p>
+                            <p><strong>Buyer Order No:</strong> ${buyerOrderNo}</p>
+                            <p><strong>Delivery Date:</strong> ${deliveryDate}</p>
+                        </div>
+                    </div>
+
+                    <div style="margin: 30px 0;">
+                        <h3 style="color: #333; margin-bottom: 15px;">Bill To:</h3>
+                        <p><strong>${buyerName}</strong></p>
+                        <p>${buyerAddress}</p>
+                        <p>Phone: ${buyerPhone}</p>
+                        <p>Pincode: ${buyerPincode}</p>
+                        <p>GSTIN: ${buyerGSTIN}</p>
+                    </div>
+
+                    <table class="invoice-table">
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>Product Name</th>
+                                <th>HSN/SAC</th>
+                                <th>GST Rate</th>
+                                <th>Quantity</th>
+                                <th>Rate</th>
+                                <th>Discount</th>
+                                <th>Total Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${productsHTML}
+                        </tbody>
+                    </table>
+
+                    <div class="total-section">
+                        <p><strong>Subtotal: ₹${subtotal.toFixed(2)}</strong></p>
+                        <p><strong>Total GST: ₹${totalGST.toFixed(2)}</strong></p>
+                        <p style="font-size: 1.2em; color: #667eea;"><strong>Grand Total: ₹${grandTotal.toFixed(2)}</strong></p>
+                        <p><em>Amount in Words: ${amountInWords} Rupees Only</em></p>
+                    </div>
+
+                    <div style="margin-top: 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                        <div>
+                            <h4>Bank Details:</h4>
+                            <p>Bank Name: ${bankName}</p>
+                            <p>Account No: ${accountNumber}</p>
+                            <p>IFSC Code: ${ifscCode}</p>
+                            <p>Branch: ${branchName}</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <p style="margin-top: 60px;">Authorized Signature</p>
+                            <div style="border-top: 1px solid #333; width: 200px; margin-left: auto; margin-top: 20px;"></div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 30px; font-size: 12px; color: #666;">
+                        <p><strong>Terms & Conditions:</strong></p>
+                        <p>Dispatch Document No: ${dispatchDocNo}</p>
+						<p>Mode OF Transport: ${ModeOfTransport}</p>
+						<p>Number of Parcel: ${NumberOfParcel}</p>
+                        <p>Terms of Delivery: ${termsOfDelivery}</p>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('invoicePreview').innerHTML = previewHTML;
+            document.getElementById('invoicePreview').classList.remove('hidden');
+        }
+
+        // Download PDF with improved functionality
+        function downloadPDF() {
+            // Validate required fields
+            if (!document.getElementById('buyerName').value) {
+                alert('Please enter buyer name before generating PDF');
+                return;
+            }
+
+            generatePreview();
+            
+            const element = document.getElementById('invoicePreview');
+            const invoiceNo = document.getElementById('invoiceNo').value;
+            
+            // Use html2canvas with better options
+            html2canvas(element, {
+                scale: 2,
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: '#ffffff'
+            }).then(canvas => {
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                
+                const imgData = canvas.toDataURL('image/png');
+                const imgWidth = 210; // A4 width in mm
+                const pageHeight = 295; // A4 height in mm
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                let heightLeft = imgHeight;
+                let position = 0;
+
+                // Add first page
+                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+
+                // Add additional pages if needed
+                while (heightLeft >= 0) {
+                    position = heightLeft - imgHeight;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+
+                // Download the PDF
+                pdf.save(`Invoice_${invoiceNo}.pdf`);
+                
+                // Update statistics and reset form
+                updateStatistics();
+            }).catch(error => {
+                console.error('Error generating PDF:', error);
+                alert('Error generating PDF. Please try again.');
+            });
+        }
+
+        // Update statistics after generating invoice
+        function updateStatistics() {
+            let grandTotal = 0;
+            products.forEach(product => {
+                const productSubtotal = (parseFloat(product.quantity) || 0) * (parseFloat(product.rate) || 0);
+                const discountAmount = productSubtotal * ((parseFloat(product.discount) || 0) / 100);
+                const afterDiscount = productSubtotal - discountAmount;
+                const gstAmount = afterDiscount * ((parseFloat(product.gst) || 0) / 100);
+                grandTotal += afterDiscount + gstAmount;
+            });
+
+            totalBills++;
+            totalAmount += grandTotal;
+            
+            localStorage.setItem('invoiceCounter', invoiceCounter);
+            localStorage.setItem('totalBills', totalBills);
+            localStorage.setItem('totalAmount', totalAmount);
+            
+            updateDashboard();
+            
+            // Reset form for next invoice
+            invoiceCounter++;
+            generateInvoiceNumber();
+            products = [];
+            document.getElementById('productsTableBody').innerHTML = '';
+            addProduct();
+            
+            // Clear form fields
+            document.getElementById('buyerName').value = '';
+            document.getElementById('buyerAddress').value = '';
+            document.getElementById('buyerPhone').value = '';
+            document.getElementById('buyerPincode').value = '';
+            document.getElementById('buyerGSTIN').value = '';
+            document.getElementById('buyerOrderNo').value = '';
+            document.getElementById('deliveryDate').value = '';
+            document.getElementById('dispatchDocNo').value = '';
+			document.getElementById('ModeOfTransport').value = '';
+			document.getElementById('NumberOfParcel').value = '';
+            document.getElementById('termsOfDelivery').value = '';
+            
+            document.getElementById('invoicePreview').classList.add('hidden');
+            
+            alert('Invoice generated successfully! Form has been reset for the next invoice.');
+        }
+
+        // Load dashboard data
+        function loadDashboardData() {
+            totalBills = parseInt(localStorage.getItem('totalBills')) || 0;
+            totalAmount = parseFloat(localStorage.getItem('totalAmount')) || 0;
+            updateDashboard();
+        }
+
+        // Update dashboard display
+        function updateDashboard() {
+            document.getElementById('totalBills').textContent = totalBills;
+            document.getElementById('totalAmount').textContent = `₹${totalAmount.toFixed(2)}`;
+            document.getElementById('thisMonth').textContent = totalBills; // Simplified for demo
+            document.getElementById('lastInvoice').textContent = invoiceCounter > 1 ? `TVB${String(invoiceCounter - 1).padStart(4, '0')}` : '-';
+        }
+
+        // Save settings
+        function saveSettings() {
+            const settings = {
+                companyName: document.getElementById('companyName').value,
+                companyAddress: document.getElementById('companyAddress').value,
+                companyPhone: document.getElementById('companyPhone').value,
+                companyCode: document.getElementById('companyCode').value,
+                companyPAN: document.getElementById('companyPAN').value,
+                bankName: document.getElementById('bankName').value,
+                accountNumber: document.getElementById('accountNumber').value,
+                ifscCode: document.getElementById('ifscCode').value,
+                branchName: document.getElementById('branchName').value
+            };
+            
+            localStorage.setItem('companySettings', JSON.stringify(settings));
+            alert('Settings saved successfully!');
+        }
+
+        // Load settings
+        function loadSettings() {
+            const settings = JSON.parse(localStorage.getItem('companySettings') || '{}');
+            
+            Object.keys(settings).forEach(key => {
+                const element = document.getElementById(key);
+                if (element) {
+                    element.value = settings[key];
+                }
+            });
+        }
+
+        // Initialize the application when page loads
+        window.onload = init;
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97a6c9fcc7c5032a',t:'MTc1NzA4NjQ0OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
