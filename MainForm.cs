@@ -3,7 +3,7 @@ using Microsoft.Web.WebView2.WinForms;
 
 namespace TVTRON_Bills
 {
-    public partial class MainForm : Form
+    public partial class MainForm : BaseForm
     {
         private WebView2 webView;
 
@@ -13,8 +13,7 @@ namespace TVTRON_Bills
             this.Text = "TVTron Bills";
             this.WindowState = FormWindowState.Maximized;
             this.Load += MainForm_Load;
-            
-        }
+            this.Load += MainForm_Load;
 
         private async void MainForm_Load(object sender, EventArgs e)
         {
@@ -29,7 +28,8 @@ namespace TVTRON_Bills
                 webView.Source = new Uri(indexPath);
                 return;
             }
-
+             //Add the below code for the opposite site developement
+              webView.CoreWebView2.Navigate("https://google.com");
             // Option B: fallback to a remote URL if provided
             webView.CoreWebView2.Navigate("https://example.com");
         }
