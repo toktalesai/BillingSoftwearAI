@@ -9,12 +9,11 @@ namespace TVTRON_Bills
 
         public MainForm()
         {
+            InitializeComponents();
             this.Text = "TVTron Bills";
             this.WindowState = FormWindowState.Maximized;
             this.Load += MainForm_Load;
             this.Load += MainForm_Load;
-            InitializeComponents();
-        }
 
         private async void MainForm_Load(object sender, EventArgs e)
         {
