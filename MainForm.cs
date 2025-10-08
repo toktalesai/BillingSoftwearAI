@@ -12,6 +12,7 @@ namespace TVTRON_Bills
             this.Text = "TVTron Bills";
             this.WindowState = FormWindowState.Maximized;
             this.Load += MainForm_Load;
+            this.Load += MainForm_Load;
             InitializeComponents();
         }
 
@@ -43,3 +44,4 @@ namespace TVTRON_Bills
         }
     }
 }
+
